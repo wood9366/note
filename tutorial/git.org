@@ -3,6 +3,7 @@
 #+DATE: 2018.7.19
 #+EMAIL: 7325560@qq.com
 
+#+OPTIONS: num:nil
 #+OPTIONS: toc:nil
 
 * VCS
@@ -102,12 +103,12 @@ git reset
 - git pull
 - git push
 * What happened ?
-* Remote ?
+* Remote
 - git remote -v
 - git remote -vv
 - git remote add sync-origin git@192.168.1.100:ink-sanguo
 - git remote set sync-origin git@192.168.1.100:ink-sanguo
-* Branch ?
+* Branch
 ** Branch Implementation
 - C++ Pointer, Smart, easy and light weight way to track branch
 - [Picture Branch]
@@ -123,6 +124,7 @@ git reset
   - set remote branch to be up stream of local branch
   - switch to created local branch
 - git checkout -b bug/203003
+* Merge vs Rebase
 * Books
 - Git权威指南, ISBN 9787111349679
 - Pro Git, official, https://git-scm.com/book/en/v2
