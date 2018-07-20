@@ -1,0 +1,128 @@
+#+TITLE: Git
+#+AUTHOR: Li Yang
+#+DATE: 2018.7.19
+#+EMAIL: 7325560@qq.com
+
+#+OPTIONS: toc:nil
+
+* VCS
+VCS (Version Control System)
+- CVS
+- SVN, Subversion
+- Hg, Mercurial
+- Git
+- Perforce
+#+REVEAL: split
+[Table] Feature and compare
+* Force on Git
+[Picture]
+* Local Usage
+** Config
+#+BEGIN_SRC shell
+git config --global user.name "liyang"
+git config --global user.email "7325560@qq.com"
+#+END_SRC
+** Create Repository
+#+BEGIN_SRC shell
+git clone http://github.com:wood9366/dot-emacs
+git init .
+#+END_SRC
+** Add File
+#+BEGIN_SRC shell
+echo 'Hello!' > ./README.md
+git add .
+git commit -m "add readme file"
+#+END_SRC
+** Change File
+#+BEGIN_SRC shell
+echo '=======' >> ./README.md
+git add -u
+git commit -m "add split line in readme file"
+#+END_SRC
+** Log
+#+BEGIN_SRC shell
+git log
+#+END_SRC
+* What happened ?
+** .git
+[Picture] structure
+** git config
+[Table] Usage Scope, Store Location (Linux, Windows)
+#+REVEAL: split
+#+BEGIN_SRC shell
+git config --list
+git config --global color.ui "auto"
+git config --local ...
+git config --system ...
+#+END_SRC
+** object commit, tree, blob, tag
+#+BEGIN_SRC shell
+git cat-file -t object
+git cat-file -p object
+git rev-parse HEAD
+#+END_SRC
+** management with snapshot
+[Picture]
+* Create
+#+BEGIN_SRC shell
+git clone http://github.com:guns/ink-sanguo
+git clone --depth 1 # no history info, save space
+git init
+git init --bare # no work space
+#+END_SRC
+* Stage
+Cached
+Index
+#+BEGIN_SRC shell
+git add -u
+git add .
+git add -- file
+git add -i
+
+git rm file
+git rm --cached file
+
+git mv file1 file2
+#+END_SRC
+* Unstage
+#+BEGIN_SRC shell
+git reset
+#+END_SRC
+- [Picture]
+* Work Space <-> Stage <-> Repository Branch
+- git checkout vs git reset
+* Commit, Diff
+- git status
+- git commit
+- git commit -a
+- git diff
+* Check Log
+- git log --graph -a
+* Sync
+- git pull
+- git push
+* What happened ?
+* Remote ?
+- git remote -v
+- git remote -vv
+- git remote add sync-origin git@192.168.1.100:ink-sanguo
+- git remote set sync-origin git@192.168.1.100:ink-sanguo
+* Branch ?
+** Branch Implementation
+- C++ Pointer, Smart, easy and light weight way to track branch
+- [Picture Branch]
+- Where is branch store ?
+** More Branch
+- Local Branch
+- Remote Branch
+** Branch operation
+- git branch -a -v
+- git checkout publish
+  - check remote has same name branch
+  - create local branch with that name
+  - set remote branch to be up stream of local branch
+  - switch to created local branch
+- git checkout -b bug/203003
+* Books
+- Git权威指南, ISBN 9787111349679
+- Pro Git, official, https://git-scm.com/book/en/v2
