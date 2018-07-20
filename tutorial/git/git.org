@@ -14,8 +14,13 @@ VCS (Version Control System)
 - Git
 - Perforce
 #+REVEAL: split
-[Table] Feature and compare
-* Force on Git
+| Name | Type            | Commit              |
+|------+-----------------+---------------------|
+| CVS  | Client - Server | Changeset           |
+| SVN  | Client - Server | Changeset, Snapshot |
+| Hg   | Distribution    |                     |
+| Git  | Distribution    | Snapshot            |
+#+REVEAL: split
 [Picture]
 * Local Usage
 ** Config
