@@ -5,6 +5,7 @@
 
 #+OPTIONS: num:nil
 #+OPTIONS: toc:nil
+#+REVEAL_EXTRA_CSS: ./data/custom.css
 
 * VCS
 VCS (Version Control System)
@@ -21,8 +22,8 @@ VCS (Version Control System)
 | Hg   | Distribution    |                     |
 | Git  | Distribution    | Snapshot            |
 #+REVEAL: split
-[Picture]
-* Local Usage
+#+REVEAL_HTML: <div class="figure"><p><img src="./data/git-icon.png" class="icon"></img></p></div>
+* Usage
 ** Config
 #+BEGIN_SRC shell
 git config --global user.name "liyang"
