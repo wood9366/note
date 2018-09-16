@@ -1,59 +1,137 @@
-#+TITLE: Git
+#+TITLE: Git Guide
 #+AUTHOR: Li Yang
 #+DATE: 2018.7.19
 #+EMAIL: 7325560@qq.com
 
+#+REVEAL_THEME: moon
 #+OPTIONS: num:nil
 #+OPTIONS: toc:nil
 #+REVEAL_EXTRA_CSS: ./data/custom.css
 
 * VCS
-VCS (Version Control System)
+Version Control System
 - CVS
 - SVN, Subversion
 - Hg, Mercurial
 - Git
 - Perforce
+
 #+REVEAL: split
-| Name | Type            | Commit              |
+| Name | Depoly          | Management          |
 |------+-----------------+---------------------|
-| CVS  | Client - Server | Changeset           |
 | SVN  | Client - Server | Changeset, Snapshot |
-| Hg   | Distribution    |                     |
 | Git  | Distribution    | Snapshot            |
-#+REVEAL: split
-#+REVEAL_HTML: <div class="figure"><p><img src="./data/git-icon.png" class="icon"></img></p></div>
-* Usage
+
+* 
+#+ATTR_HTML: :class icon
+[[./data/git-icon.png]]
+
+* Basic Usage
+
 ** Config
+Config _username_ and _email_
 #+BEGIN_SRC shell
 git config --global user.name "liyang"
 git config --global user.email "7325560@qq.com"
 #+END_SRC
+
 ** Create Repository
+Get from remote repository
 #+BEGIN_SRC shell
-git clone http://github.com:wood9366/dot-emacs
+git clone git@192.168.1.120:ink-sanguo-dev 
+git clone http://github.com:wood9366/dot-emacs .emacs.d
+#+END_SRC
+
+#+BEGIN_SRC shell
+git clone (Host Name):(Repository Name) [Local Directory Name]
+#+END_SRC
+
+Create at local directory
+#+BEGIN_SRC shell
 git init .
 #+END_SRC
+
 ** Add File
 #+BEGIN_SRC shell
 echo 'Hello!' > ./README.md
 git add .
 git commit -m "add readme file"
 #+END_SRC
+
 ** Change File
 #+BEGIN_SRC shell
 echo '=======' >> ./README.md
 git add -u
 git commit -m "add split line in readme file"
 #+END_SRC
-** Log
+
+** Review Log
 #+BEGIN_SRC shell
 git log
 #+END_SRC
-* What happened ?
+
+* What happened?
 ** .git
-[Picture] structure
-** git config
+#+BEGIN_SRC shell
+.git
+  config       # repo config
+  info/exclude # repo exclude filter
+  logs/        # record branch change
+  refs/        # referencs (branches)
+  index        # index (stage) data
+  objects/     # objects data
+  hooks/       # git hook script
+#+END_SRC
+
+** Objects
+- Git manage all things by _object_
+- All objects store in .git/objects/
+- Eash object has unique id (40 bit hash)
+- 4 main object type:
+  - commit
+  - tree (directory)
+  - blob (file)
+  - tag
+
+#+REVEAL: split
+#+BEGIN_SRC shell
+git cat-file -t object # get object type
+git cat-file -p object # print object info
+#+END_SRC
+
+#+BEGIN_SRC shell
+git rev-parse HEAD                      # parse reversion to hash
+git rev-parse --symbolic-full-name HEAD # parse reversion to refs/
+#+END_SRC
+
+** Refs
+- Git manage branch by reference
+- All reference store in .git/refs/
+- Reference is a file inclues commit object hash
+
+#+BEGIN_SRC shell
+.git/refs
+  remotes/ # remote branches
+  heads/   # local branches
+  stash
+#+END_SRC
+
+** Logs
+- Log record change history of each _reference_
+
+#+BEGIN_SRC shell
+.git/logs
+  HEAD
+  refs/heads/
+  refs/remotes/
+  refs/stash
+#+END_SRC
+
+** Management commit with Snapshot
+- Snapshot vs Store size
+
+* More Usage
+** Config
 [Table] Usage Scope, Store Location (Linux, Windows)
 #+REVEAL: split
 #+BEGIN_SRC shell
@@ -62,13 +140,13 @@ git config --global color.ui "auto"
 git config --local ...
 git config --system ...
 #+END_SRC
-** object commit, tree, blob, tag
+#+REVEAL: split
 #+BEGIN_SRC shell
-git cat-file -t object
-git cat-file -p object
-git rev-parse HEAD
+git config --global alias.ci commit
+git config --global alias.co checkout
+git config --global alias.st status
+git config --global alias.br branch
 #+END_SRC
-** management with snapshot
 [Picture]
 * Create
 #+BEGIN_SRC shell
@@ -96,7 +174,7 @@ git mv file1 file2
 git reset
 #+END_SRC
 - [Picture]
-* Work Space <-> Stage <-> Repository Branch
+* Work Space <-> Index <-> Repository Current Branch
 - git checkout vs git reset
 * Commit, Diff
 - git status

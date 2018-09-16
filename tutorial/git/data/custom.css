@@ -1,5 +1,38 @@
-.reveal section img.icon {
+body {
+  background: #0F0F0F;
+  background-color: #0F0F0F;
+}
+
+.reveal img.icon {
   border: 0;
   box-shadow: none;
   background: none;
+}
+
+.reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
+  text-transform: none;
+  font-family: Rockwell;
+}
+
+.reveal .title {
+  margin: 0 auto 80px;
+  font-weight: bold;
+  font-size: 120px;
+}
+
+.reveal .author {
+  padding: 0;
+  margin: 0;
+  font-family: Arial;
+  font-style: italic;
+  font-size: 20px;
+}
+
+.reveal .date {
+  display: none;
+}
+
+.reveal .src {
+  background: #1F1F1F;
+  padding: 5px;
 }
