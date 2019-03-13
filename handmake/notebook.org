@@ -45,7 +45,6 @@ Y47.5 [[https://item.jd.com/24493755554.html#crumb-wrap][HM图文办公]] 80g A4
 - 200g以上的牛皮纸
 Y13.8 [[https://detail.tmall.com/item.htm?spm=a1z10.5-b.w4011-12653839102.57.5fad52d6ZGdpDA&id=545071702912&rn=08a5b2bd0e14e7e6634e543bb6bc23a8&abbucket=5&skuId=3286345564966][有米办公专营店]] 350g A4牛皮纸 25张
 *** 缝线
-Y6 [[https://detail.tmall.com/item.htm?spm=a1z10.5-b.w4011-16834238328.171.5aff77ebWWJ05S&id=582971577467&rn=76926eb12e0283c3563e9b9f44fa1516&abbucket=5&skuId=3918067656678][买]] 20S/3 牛仔线 卡其色
 Y4.6 [[https://detail.tmall.com/item.htm?spm=a1z10.5-b.w4011-19066432670.71.72312317rk3gQv&id=581410545490&rn=145513e6e7d7c6e18e6cc4029ac44d32&abbucket=5&skuId=4055953347897][舞彩家纺旗舰店]] 20S/3 牛仔线 卡其色
 *** 缝针
 Y9.4 [[https://detail.tmall.com/item.htm?spm=a1z10.3-b.w4011-19066956066.96.1ed2333726onCN&id=581118289839&rn=b88c5cf95119c883fbd093465892ae7f&abbucket=5&skuId=4050120623275][舞彩家纺旗舰店]] 钝头大眼针 长6cm 直径1.2mm
@@ -56,10 +55,11 @@ Y6.8 [[HTTps://detail.tmall.com/item.htm?spm=a1z10.5-b-s.w4011-18333167253.39.77
 *** 纱布
 Y13 [[https://detail.tmall.com/item.htm?spm=a1z10.5-b-s.w4011-16183686921.102.30373b6asE74dn&id=14623081359&rn=89a23301e00e0d951f1f58dc8b7c81e4&skuId=3100297544618][喜艺坊]] #1粗麻
 Y10 [[https://detail.tmall.com/item.htm?spm=a1z10.5-b-s.w4011-16183686921.102.30373b6asE74dn&id=14623081359&rn=89a23301e00e0d951f1f58dc8b7c81e4&skuId=3100297544618][喜艺坊]] #2较稀粗麻
-*** 固定夹子 
-#1 51mm 夹20mm
+*** 长尾夹
+Y14 [[https://item.jd.com/15391666534.html][上海欧彪办公专营店]] #1 51mm 夹20mm 12个1盒
+Y8.8 [[https://item.jd.com/15391666534.html][上海欧彪办公专营店]] #6 15mm 60个1盒
 *** 灰板纸
 用于夹紧都有内页叠
 Y3.92 [[https://item.jd.com/24797790425.html#crumb-wrap][HM图文办公]] 3mm A4 灰板纸 2张 Y1.96每张
 *** 裁纸器
-Y42 [[https://item.jd.com/30575772042.html#crumb-wrap][环美裁纸器]]
+Y42 [[https://item.jd.com/30575772042.html#crumb-wrap][上海欧彪办公专营店]] 环美裁纸器
