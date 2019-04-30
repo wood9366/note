@@ -22,7 +22,7 @@ Version Control System
 | SVN  | Client - Server | Changeset, Snapshot |
 | Git  | Distribution    | Snapshot            |
 
-* 
+#+REVEAL: split
 #+ATTR_HTML: :class icon
 [[./data/git-icon.png]]
 
