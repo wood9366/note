@@ -1,0 +1,282 @@
+#+TITLE: 理解Git
+#+AUTHOR: 李阳
+#+DATE: 2019.4.30
+#+EMAIL: 7325560@qq.com
+
+#+REVEAL_THEME: moon
+#+OPTIONS: num:nil
+#+OPTIONS: toc:nil
+#+OPTIONS: ^:nil
+#+REVEAL_EXTRA_CSS: ./data/custom.css
+
+* 版本控制系统
+VCS - Version Control System
+- CVS
+- SVN, Subversion
+- Hg, Mercurial
+- Git
+- Perforce
+
+#+REVEAL: split
+| 名称 | 部署            | 管理           |
+|------+-----------------+----------------|
+| SVN  | 客户端 - 服务器 | 增量式, 快照式 |
+| Git  | 分布式          | 快照式         |
+
+* 
+#+ATTR_HTML: :class icon
+[[./data/git-icon.png]]
+
+* 开始
+- 资料看官方网站
+- git是命令行工具、GUI只是包装
+- 分布式
+  
+* 分布式
+- 每个仓库都是一个完整的git仓库
+- pull/push为不同仓库之间的数据同步
+  
+* 单仓库使用
+- config
+- stage/unstage
+- commit
+- branch
+- log
+  
+* 创建本地库
+#+BEGIN_SRC shell
+git init .
+#+END_SRC
+
+* 配置
+** 配置用户名和邮件地址
+- config命令只是修改ini格式的配置文件
+#+BEGIN_SRC shell
+git config --global user.name "liyang"
+git config --global user.email "7325560@qq.com"
+#+END_SRC
+
+** 配置文件的作用域
+- 系统 > 用户/全局 > 仓库
+- 系统 /etc/gitconfig
+- 用户/全局 $HOME/.gitconfig
+- 仓库 .git/config
+
+#+REVEAL: split
+#+BEGIN_SRC shell
+git config --list
+git config --global --list
+git config --system --list
+git config --local --list
+#+END_SRC
+
+** 命令别名
+#+BEGIN_SRC shell
+git config --global alias.ci commit
+git config --global alias.co checkout
+git config --global alias.st status
+git config --global alias.br branch
+#+END_SRC
+
+** 关闭文件权限追踪
+#+BEGIN_SRC shell
+git config --local core.fileMode false
+#+END_SRC
+
+** 自动转换换行符
+在window系统上使用crlf换行符，存储时使用lf换行符
+#+BEGIN_SRC shell
+git config --global core.autocrlf true
+#+END_SRC
+
+* 提交
+** 待提交区域(Stage/Index)
+#+ATTR_HTML: :class icon
+[[./data/git-stage.png]]
+
+** 快照式
+- 每次commit都是完整的目录树快照
+- Stage/Index可以理解为是一个待生成的commit，也是目录树快照
+- Work Space当然包含完整的目录树
+  
+** Status
+显示Work Space和Stage的状态
+#+BEGIN_SRC bash
+git status
+git status -s
+#+END_SRC
+
+#+REVEAL: split
+#+ATTR_HTML: :class icon
+[[./data/git-stage.png]]
+
+未提交的更改，比较Work Space和Stage
+
+待提交的更改，比较的是Stage和HEAD
+
+** Stage
+添加当前目录下所有文件到待提交列表
+#+BEGIN_SRC bash
+git add .
+#+END_SRC
+
+添加指定文件、目录到待提交列表
+#+BEGIN_SRC bash
+git add -- [file/dir]
+#+END_SRC
+
+#+REVEAL: split
+添加所有修改的文件（删除）到待提交列表
+#+BEGIN_SRC bash
+git add -u
+#+END_SRC
+
+#+REVEAL: split
+#+BEGIN_SRC bash
+git rm -- [file/dir]
+git rm --cached -- [file/dir]
+#+END_SRC
+
+** Unstage
+把所有文件移出待提交列表
+#+BEGIN_SRC bash
+git reset
+#+END_SRC
+
+把指定文件、目录移出待提交列表
+#+BEGIN_SRC bash
+git reset -- [file/dir]
+#+END_SRC
+
+** Commit
+#+BEGIN_SRC bash
+git commit -m "fix bug 93929"
+#+END_SRC
+
+** .git
+#+BEGIN_SRC bash
+.git
+  config       # 仓库配置
+  info/exclude # 仓库忽略配置
+  logs/        # 记录分支的变化
+  refs/        # 分支信息
+  index        # 待提交信息(index/stage)
+  objects/     # 对象数据
+  hooks/       # 钩子脚本
+#+END_SRC
+
+** objects
+- Git用 *object* 存储和管理所有东西
+- 每个对象都有唯一的hash值40位
+  
+** 对象类型
+- 提交 commit
+- 目录 tree (directory)
+- 数据 blob (file)
+- 标记 tag
+  
+#+REVEAL: split
+- commit-ish (committish) 提交对象或者包含提交对象的对象
+- tree-ish (treeish) 目录对象或者包含目录对象的对象
+  
+** 获取对象类型和信息的命令
+#+BEGIN_SRC shell
+git cat-file -t object # 获取指定对象的类型
+git cat-file -p object # 输出指定对象的信息
+#+END_SRC
+
+** Git是如何用objects组织所有数据的？
+- 目录树快照
+- 数据压缩和gc
+
+* 分支
+** 查看分支
+列出所有本地分支并标记当前分支，-a列出所有远程分支
+#+BEGIN_SRC shell
+git branch [-a]
+#+END_SRC
+
+** 操作分支
+从当前HEAD建立分支
+#+BEGIN_SRC shell
+git branch opentest
+#+END_SRC
+
+删除分支
+#+BEGIN_SRC shell
+git branch -d opentest
+#+END_SRC
+
+切换分支
+#+BEGIN_SRC shell
+git checkout opentest
+#+END_SRC
+
+创建并切换分支
+git checkout -b opentest
+
+** Git如何表示分支？
+- 指向commit对象的指针
+- 用commit对象的parent找到提交历史
+  
+** .git/refs
+- heads，本地分支
+- remotes，远程分支
+- tags, 标记
+  
+** 特殊指针
+- HEAD，当前分支
+- ORIG_HEAD
+- FETCH_HEAD
+- MERGE_HEAD
+...
+
+** 获取分支的Hash
+#+BEGIN_SRC shell
+git rev-parse [ref]
+git rev-parse --symbolic-full-name [ref] # 获取HEAD的ref文件位置
+#+END_SRC
+
+#+REVEAL: split
+- HEAD = @
+- HEAD^, HEAD^^ = HEAD~2
+- HEAD^1, HEAD^2 多个父commit
+- HEAD^0 = committish
+- HEAD^{} = taggish
+- HEAD^{tree} = treeish
+- HEAD@{1} 最近一次变化的之前的HEAD(reflog)
+  
+* 历史
+#+BEGIN_SRC shell
+git log -5 #显示最近5次
+git log --author=liyang #根据提交人过滤
+git log --stat #显示提交状态
+git log -p #显示完整diff
+git log --oneline #精简模式
+git log --graph #图形模式
+git log --since --until #设置显示时间范围
+git log --all #显示所有分支log
+#+END_SRC
+
+* 
+#+ATTR_HTML: :class icon
+[[./data/question.png]]
+
+* Reflog
+
+* Merge
+
+========
+
+** Branch operation
+- git branch -a -v
+- git checkout publish
+  - check remote has same name branch
+  - create local branch with that name
+  - set remote branch to be up stream of local branch
+  - switch to created local branch
+- git checkout -b bug/203003
+* Merge vs Rebase
+* Books
+- Git权威指南, ISBN 9787111349679
+- Pro Git, official, https://git-scm.com/book/en/v2
