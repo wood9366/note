@@ -189,6 +189,23 @@ git cat-file -p object # 输出指定对象的信息
 - 目录树快照
 - 数据压缩和gc
 
+
+* 历史
+#+BEGIN_SRC shell
+git log -5 #显示最近5次
+git log --author=liyang #根据提交人过滤
+git log --stat #显示提交状态
+git log -p #显示完整diff
+git log --oneline #精简模式
+git log --graph #图形模式
+git log --since --until #设置显示时间范围
+git log --all #显示所有分支log
+#+END_SRC
+
+* 
+#+ATTR_HTML: :class icon
+[[./data/question.png]]
+
 * 分支
 ** 查看分支
 列出所有本地分支并标记当前分支，-a列出所有远程分支
@@ -231,7 +248,12 @@ git checkout -b opentest
 - MERGE_HEAD
 ...
 
-** 获取分支的Hash
+** rev
+- 标示一次提交
+- 可能是hash
+- 可能是分支名
+- 可能HEAD指针
+
 #+BEGIN_SRC shell
 git rev-parse [ref]
 git rev-parse --symbolic-full-name [ref] # 获取HEAD的ref文件位置
@@ -246,37 +268,132 @@ git rev-parse --symbolic-full-name [ref] # 获取HEAD的ref文件位置
 - HEAD^{tree} = treeish
 - HEAD@{1} 最近一次变化的之前的HEAD(reflog)
   
-* 历史
-#+BEGIN_SRC shell
-git log -5 #显示最近5次
-git log --author=liyang #根据提交人过滤
-git log --stat #显示提交状态
-git log -p #显示完整diff
-git log --oneline #精简模式
-git log --graph #图形模式
-git log --since --until #设置显示时间范围
-git log --all #显示所有分支log
+* 合并
+** merge
+- 把指定分支合并到当前分支
+- 会生成merge的commit
+- 这个合并的commit包含的是别的分支的改动
+#+BEGIN_SRC bash
+git merge [branch]
+#+END_SRC
+
+** 冲突
+- 两个分支都改过相同文件的同一行时
+- 对于二进制文件只要都修改过
+  
+** 解决冲突
+- 三向合并，Base, Mine, Their
+- 比较工具vimdiff, beyond compare
+- 直接编辑文件去掉>>>>>>
+
+* 
+#+ATTR_HTML: :class icon
+[[./data/question.png]]
+
+* reset, checkout
+- WorkSpace, Stage是两个独立的目录树快照
+  
+** Checkout
+- Checkout修改HEAD指向
+- 根据HEAD的位置重置WorkSpace
+- 指向为分支名，切换分支
+- 指向为hash，头分离
+  
+** Reset
+- Reset修改当前分支的指向
+- --mixed重置Stage，保留WorkSpace
+- --soft两个都保留
+- --hard两个都重置
+  
+** 提交反悔
+#+BEGIN_SRC
+git commit --amend
+git reset --soft HEAD^
 #+END_SRC
 
 * 
 #+ATTR_HTML: :class icon
 [[./data/question.png]]
 
-* Reflog
+* pull, push
+- 同步不同库的objects, refs, tags
+- 同步之间会自动调用gc
+- 远程库的分支在refs/remote下
 
-* Merge
+* remote <origin>
+- remote管理所有的远程仓库
+- clone之后的会发现有个origin的remote
+#+BEGIN_SRC
+git remote -v
+git remote add origin git@192.168.2.120:ink-sanguo-dev
+git remote set-url origin git@192.168.2.120:ink-sanguo-data
+#+END_SRC
 
-========
+* clone做了什么？
+- 把指定地址的仓库的objects, refs和tags全部拿到本地
+- 新建名字为origin的远程仓库，地址为clone的地址
+- 本地建立master分支并以远程分支的master为上游分支
+  
+* pull做了什么？
+- fetch + merge
+- fetch从远程仓库更新信息，但不影响任何本地信息
+- merge把更新过的上游分支合并到当前分支
+- 所以pull成功后有一次merge的提交
+- 所以pull可能会产生冲突，有merge的操作
+  
+* pull的merge
+- 就是上游分支与本地分支的合并
+- 如果冲突，看到的改动应该都是上游分支的，意思是不是你自己的
+- 解决冲突是把你的修改融合到上游分支的修改中
+  
+* rebase
+- 变基
+- master分支的提交推荐使用，可以减少一次merge的提交
+- 本质是找到本地和上游分支共同的头
+- cherrypick所有的本地分支到共同头的改动到上游分支
+  
+* cherrypick
+- 提取一次或多次提交到当前分支
+- 修bug利器，在发布分支修好提交，再cherrypick到开发分支
+#+BEGIN_SRC
+git cherrypick dbc82r4
+#+END_SRC
 
-** Branch operation
-- git branch -a -v
-- git checkout publish
-  - check remote has same name branch
-  - create local branch with that name
-  - set remote branch to be up stream of local branch
-  - switch to created local branch
-- git checkout -b bug/203003
-* Merge vs Rebase
-* Books
+* rev range
+  
+* push做了什么？
+- 检查是否远程分支有更新
+- 检查本地分支相对远程分支是否为快进式提交
+- 把本地的objects和本地分支位置更新到远程对应分支
+  
+* 快进式提交
+- 本地分支向上追溯能找到远程分支
+- 不是就意味着，在你上次更新后有人提交过数据
+- 所以push提示非快进式提交后要用pull更新后才能再提交
+  
+* 如何快速建立与远程分支对应的本地分支？
+- 直接用远程分支的名字来checkout
+- checkout会检查有没有这个远程分支
+- 有，就会以这个名字建立本地分支
+- 并把远程分支设置为上游分支
+#+BEGIN_SRC
+git checkout feature/war
+#+END_SRC
+
+* ref log
+- git记录的所有分支和HEAD的位置变化
+- 保存在.git/logs
+- HEAD@{1}，上次HEAD位置的rev
+  
+* stash
+#+BEGIN_SRC
+git stash 
+git stash list
+git stash pop/apply [stash@{0}]
+git stash drop stash@{1}
+git stash clear
+#+END_SRC
+
+* books
 - Git权威指南, ISBN 9787111349679
 - Pro Git, official, https://git-scm.com/book/en/v2
