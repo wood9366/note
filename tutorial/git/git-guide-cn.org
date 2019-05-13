@@ -106,28 +106,26 @@ git status -s
 待提交的更改，比较的是Stage和HEAD
 
 ** stage
-添加当前目录下所有文件到待提交列表
+添加当前目录下所有文件
 #+BEGIN_SRC bash
 git add .
 #+END_SRC
 
-添加指定文件、目录到待提交列表
+添加指定文件、目录
 #+BEGIN_SRC bash
 git add -- [file/dir]
 #+END_SRC
 
-#+REVEAL: split
-添加所有修改的文件（删除）到待提交列表
+添加所有修改的文件（删除）
 #+BEGIN_SRC bash
 git add -u
 #+END_SRC
 
-#+REVEAL: split
+删除指定文件、目录
 #+BEGIN_SRC bash
 git rm -- [file/dir]
 git rm --cached -- [file/dir]
 #+END_SRC
-
 ** unstage
 把所有文件移出待提交列表
 #+BEGIN_SRC bash
@@ -183,8 +181,13 @@ git log --all #显示所有分支log
 - 标记 tag
   
 #+REVEAL: split
-- commit-ish (committish) 提交对象或者包含提交对象的对象
-- tree-ish (treeish) 目录对象或者包含目录对象的对象
+commit-ish (committish)
+
+提交对象或者包含提交对象的对象
+
+tree-ish (treeish)
+
+目录对象或者包含目录对象的对象
   
 ** 获取对象类型和信息的命令
 #+BEGIN_SRC shell
@@ -201,11 +204,14 @@ git cat-file -p object # 输出指定对象的信息
 
 * branch 分支
 ** 
-列出所有本地分支并标记当前分支，-a列出所有远程分支
+列出所有本地分支并标记当前分支
+
+[-a]列出所有分支包括远程分支
+
 #+BEGIN_SRC shell
 git branch [-a]
 #+END_SRC
-
+** 
 从当前HEAD建立分支
 #+BEGIN_SRC shell
 git branch opentest
@@ -215,7 +221,7 @@ git branch opentest
 #+BEGIN_SRC shell
 git branch -d[D] opentest
 #+END_SRC
-
+** 
 切换分支
 #+BEGIN_SRC shell
 git checkout opentest
@@ -258,11 +264,12 @@ git rev-parse --symbolic-full-name [ref] # 获取HEAD的ref文件位置
 - HEAD@{u} 上游分支
 * merge 合并
 - 把两个分支合并
-- 合并成功会生成merge的commit，这个commit会有两个父commit
+- 合并成功会生成merge的commit
+- 这个commit会有两个父commit
+- 命令是把指定的branch合并到当前分支
 #+BEGIN_SRC bash
 git merge branch-name
 #+END_SRC
-- 命令是把指定的branch合并到当前分支
 ** conflict 冲突
 - 两个分支都改过相同文件
 - 对于文本文件如果修改的不是同一行，git会自行解决冲突
@@ -277,9 +284,13 @@ git merge branch-name
 - 不要恢复其他没有冲突的文件，不是你的改动
 - 不要恢复其他没有冲突的文件，不是你的改动
 * tag
-#+BEGIN_SRC
+给指定rev打标记
+#+BEGIN_SRC shell
 git tag v1
 git tag v2 -a -m "version 2"
+git tag -d v1
+git tag -l
+git tag -l -n5
 #+END_SRC
 * 
 #+ATTR_HTML: :class icon
@@ -326,14 +337,14 @@ git remote set-url origin git@192.168.2.120:ink-sanguo-data
 - 存在.git/refs/remote
 - 非本地的分支
 - 从不同的remote pull是获得
-#+BEGIN_SRC
+#+BEGIN_SRC shell
 git branch -a
 #+END_SRC
 * 上游分支
 - 一般为远程分支
 - maseter -> origin/master
 - pull和push的默认分支
-#+BEGIN_SRC
+#+BEGIN_SRC shell
 git rev-parse @{u}
 git branch -avv
 #+END_SRC
@@ -398,7 +409,7 @@ git cherrypick dbc82r4
 - checkout会检查有没有这个远程分支
 - 有，就会以这个名字建立本地分支
 - 并把远程分支设置为上游分支
-#+BEGIN_SRC
+#+BEGIN_SRC shell
 git checkout feature/war
 #+END_SRC
 * stash
