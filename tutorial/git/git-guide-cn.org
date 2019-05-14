@@ -338,10 +338,7 @@ git merge branch-name
 * 
 #+ATTR_HTML: :class icon
 [[./data/question.png]]
-* workspace - stage - rev
-** 
-- 都可以理解为commit对象
-** checkout
+* checkout
 - 修改HEAD指向
 - 根据HEAD的位置重置workspace
 - 指向为分支名，切换分支
@@ -351,7 +348,7 @@ git merge branch-name
 git checkout 28bdef3
 git checkout opentest
 #+END_SRC
-** reset
+* reset
 - reset修改当前分支的指向
 - --mixed重置Stage，保留WorkSpace
 - --soft两个都保留
@@ -367,6 +364,14 @@ git reset --soft HEAD^
 git commit --amend
 git reset --soft HEAD^
 #+END_SRC
+* commit+
+** 
+- workspace - stage - rev
+- 都可以理解为commit对象
+** 
+- 用stage生成 *新* 的commit
+- 修改分支头指向新的commit
+- 同时stage和workspace都保持不变
 * stash
 ** 
 - 保存work space的改动
