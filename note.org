@@ -1,0 +1,253 @@
+* 2019
+** 2019-04 April
+*** 2019-04-23
+**** Mysql保存某些utf8字符乱码                             :MYSQL:TECHNIQUE:
+     utf8的编码可能为2、3或4个字节，Emoji表情是4个字节，而mysql的utf8编码最多为3个字节，导致有些4自己的utf8字符不能插入。
+
+     只要将utf8的编码改为utf8mb4即可。
+
+     查看数据库默认charset和collation:
+     #+BEGIN_SRC mysql
+SHOW VARIABLES LIKE 'char%';
+SHOW VARIABLES LIKE 'collation%';
+     #+END_SRC
+
+     +--------------------------+----------------------------+
+     | Variable_name            | Value                      |
+     +--------------------------+----------------------------+
+     | character_set_client     | utf8mb4                    |
+     | character_set_connection | utf8mb4                    |
+     | character_set_database   | latin1                     |
+     | character_set_filesystem | binary                     |
+     | character_set_results    | utf8mb4                    |
+     | character_set_server     | latin1                     |
+     | character_set_system     | utf8                       |
+     | character_sets_dir       | /usr/share/mysql/charsets/ |
+     +--------------------------+----------------------------+
+
+     +----------------------+--------------------+
+     | Variable_name        | Value              |
+     +----------------------+--------------------+
+     | collation_connection | utf8mb4_general_ci |
+     | collation_database   | latin1_swedish_ci  |
+     | collation_server     | latin1_swedish_ci  |
+     +----------------------+--------------------+
+
+     其中character_set_server和collation_server就是默认配置。
+
+     这两个配置可以通过启动参数--character-set-server，--collation-server来指定。
+
+     也可以修改mysql配置文件来设置：
+     #+BEGIN_SRC ini
+[mysqld]
+character-server-server=ut8mb4
+collation-server=utf8mb4_general_ci
+     #+END_SRC
+
+     在创建库的时候可以指定charset和collation，如果没有指定则使用默认设置。
+     #+BEGIN_SRC mysql
+CREATE DATABASE IF NOT EXISTS `db_utf8mb4` CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci';
+     #+END_SRC
+
+     在创建表的时候同样可以指定charset和collation，如果没有指定，则使用数据库的设置。
+     #+BEGIN_SRC mysql
+CREATE TABLE IF NOT EXISTS `table_utf8mb4` (`id` INT) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci';
+     #+END_SRC
+*** 2019-04-24
+**** [2019-04-24 Wed 10:49] Pretty JSON in EMACS with perl  :TECHNIQUE:JSON:
+     one line perl script
+     #+BEGIN_SRC bash
+  perl -MJSON -e 'undef $/; $_ = <>; print JSON->new->allow_nonref->pretty->encode(decode_json($_))'
+     #+END_SRC
+
+     Select no pretty in emacs, call "C-u M-|" (shell comand on region), with C-u means print command result into current buffer, run prev one line perl command.
+
+     Done.
+*** 2019-04-29
+**** [2019-05-29 Wed 09:05] DNS服务器                         :TECHNIQUE:DNS:
+***** 参考资料
+      [[https://blog.51cto.com/4746316/2313279][搭建DNS服务器]]
+***** 步骤
+      centos系统
+      #+BEGIN_SRC bash
+   yum install -y bind
+      #+END_SRC
+
+      配置文件`/etc/named.conf`
+
+      - listen-on(-v6) port DNS服务器端口，默认53
+      - listen-on { any; } 改为any监听所有ip
+      - allow-query { any; } 允许所有ip查询
+      - forwarders { 114.114.114.114; }; 设置DNS转发
+      #+BEGIN_SRC conf
+   ...
+   options {
+           listen-on port 53 { any; };
+           listen-on-v6 port 53 { ::1; };
+           directory       "/var/named";
+           dump-file       "/var/named/data/cache_dump.db";
+           statistics-file "/var/named/data/named_stats.txt";
+           memstatistics-file "/var/named/data/named_mem_stats.txt";
+           recursing-file  "/var/named/data/named.recursing";
+           secroots-file   "/var/named/data/named.secroots";
+           allow-query     { any; };
+           ...
+           forwarders { 114.114.114.114; };
+           ...
+   }
+      #+END_SRC
+
+      配置正反向解析`/etc/named.rfc1912.zones`
+
+      假设需要解析的域名是`huanyu.com`，需要解析到192.168.2.131服务器
+      - 正向解析直接写域名，`file "huanyu.com.zone"`文件名可自己定义
+      - 反向解析，ip需要反写，要以`.in-addr.arpa`结尾，不用写最后一段ip
+
+      #+BEGIN_SRC zone
+   ...
+
+   // 正向解析
+   zone "huanyu.com" IN {
+           type master;
+           file "huanyu.com.zone";
+           allow-update { none; };
+   };
+
+   ...
+
+   // 反向解析
+   zone "2.168.192.in-addr.arpa" IN {
+           type master;
+           file "huanyu.com.loopback";
+           allow-update { none; };
+   };
+
+   ...
+      #+END_SRC
+
+      添加正反向域名解析文件在`/var/named`
+
+      正向解析文件`/var/named/huanyu.com.zone`
+
+      沿用上边的假设
+
+      - 前边的@表示完整的域名解析，是huanyu.com的缩写，应该与正向解析时配置的域名有关
+      - SOA(Start of Authority) 起始授权机构，
+        - ns.huangyu.com. 该域名解析使用的域名服务器
+        - mail.huanyu.com. 该域名管理者的邮件地址，第一个`.`代表@，相当于mail@huanyu.com
+        - 0, serial(Serial number)，反映域名信息变化的序列号，每次域名信息变化该项数值需要增大。格式没有要求，但一般习惯使用YYYYMMDDnn的格式，表示在某年(YYYY)、月(MM)、日(DD)进行了第几次(nn)修改
+        - 1D, refresh，备用DNS服务器隔一定时间会查询主DNS服务器中的序列号是否增加，即域文件是否有变化。这项内容就代表这个间隔的时间，单位为秒
+        - 1H, retry，这项内容表示如果备用服务器无法连上主服务器，过多久再重试，通常小于刷新时间。
+        - 1W, expiry，当备用DNS服务器无法联系上主DNS服务器时，备用DNS服务器可以在多长时间内认为其缓存是有效的，并供用户查询
+        - 3H, minimum，缓存DNS服务器可以缓存记录多长时间。这个时间比较重要，太短会增加主DNS服务器负载。如果太长，在域名信息改变时，需要更长的时间才能各地的缓存DNS服务器才能得到变化信息。
+
+      #+BEGIN_SRC dns
+   $TTL 1D
+   @	IN SOA	ns.huanyu.com. mail.huanyu.com. (
+                       0	; serial
+                       1D	; refresh
+                       1H	; retry
+                       1W	; expire
+                       3H )	; minimum
+   @	NS	ns.huanyu.com.           ; @表示huanyu.com的NS(Name Server)域名解析服务器为ns.huanyu.com
+       MX  10	mail.huanyu.com.     ; 第一项与上行相同可以忽略，huangyu.com的MX邮件解析服务器为mail.huanyu.com
+   @	A	192.168.2.131            ; huanyu.com的A解析(ipv4)为192.168.2.131
+   mail	A	192.168.2.131        ; mail.huanayu.com，只加前缀就好，解析为192.168.2.131
+   pop3	A	192.168.2.131        ; 同上
+   www	A	192.168.2.131            ; 同上
+   ns	A	192.168.2.131            ; 同上，ns.huanyu.com解析必须存在，就是所域名解析服务器必须存在
+       A	127.0.0.1
+       AAAA	::1                  ; AAAA为域名的ipv6地址解析
+      #+END_SRC
+
+      反向解析文件`/var/named/huanyu.com.loopback`
+
+      大致同正向解析，只是带前缀的A解析换成PTR，第一段写ip的最后一段，跟配置文件中组合起来
+
+      #+BEGIN_SRC dns
+   $TTL 1D
+   @	IN SOA	ns.huanyu.com. mail.huanyu.com. (
+                       0	; serial
+                       1D	; refresh
+                       1H	; retry
+                       1W	; expire
+                       3H )	; minimum
+   @	NS	ns.huanyu.com.
+       MX 10	mail.huanyu.com.
+   131	PTR	ns.huanyu.com.
+   131	PTR	mail.huanyu.com.
+   131	PTR	www.huanyu.com.
+   131	PTR	pop3.huanyu.com.
+       AAAA	::1
+       A	127.0.0.1
+      #+END_SRC
+
+** 2019-05 May
+*** 2019-05-30
+**** [2019-05-30 Thu 10:58] 3d描边                                   :RENDER:
+***** shell方法
+      模型变化到视角坐标系，前面剔除，顶点沿法线方向向外扩张
+      #+BEGIN_SRC shader
+   void shell(appdata v, inout v2f o) {
+       o.vertex = mul(UNITY_MATRIX_MV, v.vertex);
+
+       float3 normal = mul((float3x3)UNITY_MATRIX_IT_MV, v.normal);
+
+       // normal.z = -1; 避免扩张是交叉
+       o.vertex += float4(normalize(normal), 0) * _OutlineWidth;
+       o.vertex = mul(UNITY_MATRIX_P, o.vertex);
+   }
+
+   void shell2(appdata v, inout v2f o) {
+       o.vertex = UnityObjectToClipPos(v.vertex);
+
+       float3 normal = mul((float3x3)UNITY_MATRIX_IT_MV, v.normal);
+       float2 offset = mul((float2x2)UNITY_MATRIX_P, normal.xy);
+
+       // 乘o.vertex.z是保证描边宽度不随视角变化
+       o.vertex.xy += offset * _OutlineWidth * o.vertex.z;
+   }
+      #+END_SRC
+ 
+***** z-bias方法
+      模型变化到视角坐标系，前面剔除，顶点向相机方向偏移一段
+
+      #+BEGIN_SRC shader
+   void zbias(appdata v, inout v2f o) {
+       o.vertex = mul(UNITY_MATRIX_MV, v.vertex);
+       o.vertex.z += _OutlineWidth;
+       o.vertex = mul(UNITY_MATRIX_P, o.vertex);
+   }
+      #+END_SRC
+
+***** 其他
+      - 可用顶点色控制描边粗细，bias的强度，美术可以控制不同的描边效果
+
+***** 参考资料
+      - [[https://blog.csdn.net/candycat1992/article/details/45577749][漫谈轮廓线的渲染]]
+      - [[http://yrkhnshk.hatenablog.com/entry/%E3%80%90Unity%E3%80%91%E9%A0%82%E7%82%B9%E3%82%AB%E3%83%A9%E3%83%BC%E3%81%A7%E8%BC%AA%E9%83%AD%E7%B7%9A%E3%81%AE%E5%A4%AA%E3%81%95%E3%82%92%E5%88%B6%E5%BE%A1%E3%81%99%E3%82%8B][頂点カラーで輪郭線の太さを制御する]]
+      - [[https://blog.uwa4d.com/archives/usparkle_cartoonshading.html][卡通渲染及其相关技术总结]]
+      - [[https://blog.csdn.net/Garuda/article/details/79511538][罪恶装备Xrd卡通渲染]]
+** 2019-07 July
+*** 2019-07-09
+**** [2019-07-09 Tue 13:53] perl在console中输出指定颜色的log           :PERL:
+     使用Term::ANSIColor模块
+
+     再window平台需要再之前加载Win32::Console::ANSI模块才能正常工作
+
+*** 2019-07-11
+**** [2019-07-11 Thu 10:54] elisp的autoload                           :EMACS:
+***** 什么是autoload
+      首先要知道的是，要使用一个el文件的内容需要加载这个文件，就同perl的use。load-file就是做这个事情的，require相当与模块加载也是做同样的事情。
+
+      autoload的机制是，指定某个el文件中的一个或几个方法为autoload的触发点。在emacs启动的时候不加载这个el文件，当用到触发点的方法时会先自动加载这个el文件再调用对应的方法。这个就是autoload，可以让emacs再启动时不用加载很多el，当使用到某个功能的时候再去加载这个模块。autoload是后台触发的，使用上跟直接调用函数没什么区别。
+
+***** 如何指定触发点？
+      1. 使用autoload方法定义autoload的触发点
+
+      2. 在el文件定义的函数等前加上特殊的注释;;;###autoload，然后调用update-file-autoload或update-directory-autoloads来生成autoload的文件。这个autoload的文件就是根据特殊注释生成的autoload对象的文件，这个文件加载后就能再不加载el文件的情况下使用这个函数，甚至看到注释。
+
+      可以使用update-directory-autoloads来把整个目录下的所有文件的autoload都生成在一个autoload文件中，在emacs启动的时候需要加载这个autoload文件，并且需要把这个目录加到load-path中才能正常的autoload。
+
+***** 关于package的elpa
+      emacs自动的管理，再包完成安装后，会自动编译和生成这个包的autoload文件。在调用package-initialize时会调用所有已安装的包的autoload文件（推测，未证实）。
