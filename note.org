@@ -251,3 +251,31 @@ CREATE TABLE IF NOT EXISTS `table_utf8mb4` (`id` INT) CHARACTER SET 'utf8mb4' CO
 
 ***** 关于package的elpa
       emacs自动的管理，再包完成安装后，会自动编译和生成这个包的autoload文件。在调用package-initialize时会调用所有已安装的包的autoload文件（推测，未证实）。
+** 2019-09 September
+*** 2019-09-04 Wednesday
+****  Learn JS                                                           :JS:
+   <2019-09-04 Wed 17:06>
+js是解释型的语言(interpreted)，对应编译型语言(c++)，区别是是否在运行之前需要编译。js为了执行效率可能也需要编译编译，但其编译是在执行之前，叫做即时编译(Just-in-time compiling)。
+
+API, Application Programming Interfaces
+DOM, Document Object Model
+
+在HLML中插入js
+- internal js，直接写在html里，在head标签最后加入script标签。
+- external js，`<script src="script.js" defer></script>`
+  
+<script>标签的属性
+- async，异步（下载完成后）加载该脚本，不能确定加载顺序
+- defer，下载完成后按定义的顺序加载脚本
+
+如果js需要操作DOM，需要等HTML的页面加载完成后再执行
+- DOMContentLoaded，事件再DOM内容加载完会触发
+- defer属性自动完成这个工作
+- 旧方法，把script放在</body>之前，等所有HTML元素加载完再执行。当js脚本较多是会影响HTML的加载，相当与要把js代码都加载完页面才能显示。
+** 2019-10 October
+*** 2019-10-07 Monday
+**** Shader的API文档                                                  :UNITY:
+   <2019-10-07 Mon 10:54>
+Unity的Shader是基于Nvidia Cg/HLSL的
+[[https://developer.download.nvidia.cn/cg/index_stdlib.html][Nvidia Cg Api]]
+[[https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl][HLSL api]]
