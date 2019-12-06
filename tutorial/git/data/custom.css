@@ -1,21 +1,19 @@
 body {
-  background: #0F0F0F;
-  background-color: #0F0F0F;
+  /* background: #0F0F0F; */
+  /* background-color: #0F0F0F; */
 }
 
-/* .reveal {
-   font-family: "Source Han Sans";
-   }
- */
 .reveal img.icon {
   border: 0;
   box-shadow: none;
   background: none;
+  max-width: 80%;
+  margin: 10 auto;
 }
 
 .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
   text-transform: none;
-  font-family: Rockwell;
+  font-family: sans-serif
 }
 
 .reveal .title {
@@ -27,8 +25,6 @@ body {
 .reveal .author {
   padding: 0;
   margin: 0;
-  font-family: Arial;
-  font-style: italic;
   font-size: 20px;
 }
 

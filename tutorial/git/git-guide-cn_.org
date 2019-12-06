@@ -1,0 +1,543 @@
+#+TITLE: 理解Git
+#+AUTHOR: 李阳
+#+DATE: 2019.4.30
+#+EMAIL: 7325560@qq.com
+
+#+REVEAL_THEME: moon
+#+OPTIONS: num:nil
+#+OPTIONS: toc:nil
+#+OPTIONS: ^:nil
+#+OPTIONS: reveal_single_file:t
+#+REVEAL_PLUGINS: (highlight)
+#+REVEAL_EXTRA_CSS: ./data/custom.css
+
+* VCS 版本控制系统
+Version Control System
+- CVS
+- SVN, Subversion
+- Hg, Mercurial
+- Git
+- Perforce
+
+#+REVEAL: split
+| 名称 | 部署            | 管理           |
+|------+-----------------+----------------|
+| SVN  | 客户端 - 服务器 | 增量式, 快照式 |
+| Git  | 分布式          | 快照式         |
+
+* 
+#+ATTR_HTML: :class icon
+[[./data/git-icon.png]]
+
+* start
+** 
+- 官方网站 https://git-scm.com/
+- --help
+- git是命令行工具，GUI是包装
+- 分布式
+** 分布式
+- 每个仓库都是一个完整的git仓库
+- 用pull/push在不同仓库之间的数据同步
+* init
+** 
+设置当前目录为git仓库
+#+BEGIN_SRC shell
+git init .
+#+END_SRC
+添加bare参数不创建工作区
+#+BEGIN_SRC shell
+git init --bare .
+#+END_SRC
+* config
+** 配置用户名和邮件地址
+config命令只是修改ini格式的配置文件
+#+BEGIN_SRC shell
+git config --global user.name "liyang"
+git config --global user.email "7325560@qq.com"
+#+END_SRC
+** 配置文件的作用域
+- 系统 > 用户/全局 > 仓库
+- 系统 /etc/gitconfig
+- 用户/全局 $HOME/.gitconfig
+- 仓库 .git/config
+#+REVEAL: split
+#+BEGIN_SRC shell
+git config --list
+git config --global --list
+git config --system --list
+git config --local --list
+#+END_SRC
+
+** 命令别名
+#+BEGIN_SRC shell
+git config --global alias.ci commit
+git config --global alias.co checkout
+git config --global alias.st status
+git config --global alias.br branch
+#+END_SRC
+** 关闭文件权限追踪
+#+BEGIN_SRC shell
+git config --local core.fileMode false
+#+END_SRC
+** 自动转换换行符
+在window系统上使用crlf换行符，存储时使用lf换行符
+#+BEGIN_SRC shell
+git config --global core.autocrlf true
+#+END_SRC
+* commit
+** 
+- workspace 工作区
+- stage/index 待提交区
+- rev 仓库
+** status
+显示工作区和待提交区的状态
+#+BEGIN_SRC bash
+git status [-s]
+#+END_SRC
+
+#+REVEAL: split
+#+ATTR_HTML: :class icon
+[[./data/git-stage.png]]
+** ? snapshot 快照
+- 每次commit都包含完整的目录树快照
+- stage是一个待生成的commit，也包含目录树快照
+- work space同理
+
+** clean
+会清除掉本地所有未在版本控制下的文件
+ 
+清除未追踪（untracked）的文件和目录
+#+BEGIN_SRC bash
+git clean [-d] [-f] [-n]
+#+END_SRC
+** revert
+rev -> workspace
+
+清除当前目录所有改动
+#+BEGIN_SRC bash
+git checkout .
+#+END_SRC
+
+清除指定文件、目录的改动
+#+BEGIN_SRC bash
+git checkout -- file/dir
+#+END_SRC
+** stage
+workspace -> stage
+
+添加当前目录下所有文件
+#+BEGIN_SRC bash
+git add .
+#+END_SRC
+
+添加指定文件、目录
+#+BEGIN_SRC bash
+git add -- file/dir
+#+END_SRC
+
+添加所有修改的文件（删除）
+#+BEGIN_SRC bash
+git add -u
+#+END_SRC
+
+删除指定文件、目录
+#+BEGIN_SRC bash
+git rm -- file/dir
+git rm --cached -- file/dir
+#+END_SRC
+** unstage
+rev -> stage
+
+把所有文件移出待提交区
+#+BEGIN_SRC bash
+git reset
+#+END_SRC
+
+把指定文件、目录移出待提交区
+#+BEGIN_SRC bash
+git reset -- file/dir
+#+END_SRC
+** commit
+#+BEGIN_SRC bash
+git commit -m "fix bug 93929"
+#+END_SRC
+* log
+** 
+#+BEGIN_SRC shell
+git log -5 #显示最近5次
+git log --author=liyang #根据提交人过滤
+git log --stat #显示提交状态
+git log -p #显示完整diff
+git log --oneline #精简模式
+git log --graph #图形模式
+git log --since --until #设置显示时间范围
+git log --all #显示所有分支log
+#+END_SRC
+* ignore list
+** .gitignore
+- 可放在任意目录下，一般只放在根目录
+- /开头表示以根目录开始
+- 不以/开头可匹配所有目录下文件
+- 可以使用特殊的通配符
+#+BEGIN_SRC bash
+/logs
+*.so
+*.o
+#+END_SRC
+** .git/exclude
+- 格式同上
+- 本地的配置
+#+ATTR_HTML: :class icon
+[[./data/question.png]]
+* tag
+** 
+给指定rev打标记
+#+BEGIN_SRC shell
+git tag v1
+git tag v2 -a -m "version 2"
+git tag -d v1
+git tag -l
+git tag -l -n5
+#+END_SRC
+* 
+#+ATTR_HTML: :class icon
+[[./data/question.png]]
+* git如何保存数据？
+** .git
+#+BEGIN_SRC bash
+.git
+  config       # 仓库配置
+  info/exclude # 仓库忽略配置
+  logs/        # 记录分支的变化
+  refs/        # 分支信息
+  index        # 待提交信息(index/stage)
+  objects/     # 对象数据
+  hooks/       # 钩子脚本
+#+END_SRC
+** objects
+- Git用 *object* 存储和管理所有东西
+- 每个对象都有唯一的hash值40位
+** 对象类型
+- 提交 commit
+- 目录 tree (directory)
+- 数据 blob (file)
+- 标记 tag
+  
+#+REVEAL: split
+commit-ish (committish)
+
+提交对象或者包含提交对象的对象
+
+tree-ish (treeish)
+
+目录对象或者包含目录对象的对象
+  
+** 
+获取对象类型
+#+BEGIN_SRC bash
+git cat-file -t object
+#+END_SRC
+
+输出指定对象的信息
+#+BEGIN_SRC bash
+git cat-file -p object
+#+END_SRC
+
+** 优化
+- 数据压缩
+- gc，多版本数据合并
+* Git如何组织数据？
+** 
+- tree + blob，目录快照
+- commit，提交和历史
+* 
+#+ATTR_HTML: :class icon
+[[./data/question.png]]
+* branch 分支
+** 
+列出所有本地分支并标记当前分支
+#+BEGIN_SRC shell
+git branch [-a][-v][-v]
+#+END_SRC
+** 
+从当前HEAD建立分支
+#+BEGIN_SRC shell
+git branch opentest
+#+END_SRC
+
+删除分支
+#+BEGIN_SRC shell
+git branch -d[D] opentest
+#+END_SRC
+** 
+切换分支
+#+BEGIN_SRC shell
+git checkout opentest
+#+END_SRC
+
+创建并切换分支
+#+BEGIN_SRC shell
+git checkout -b opentest
+#+END_SRC
+* Git如何管理分支？
+** 
+- 轻量级，创建分支相当于创建一个文件
+- 文件名即分支名，内容为该分支头的commit的hash
+- 用分支头的commit可以通过parent找到该分支的提交历史
+- 远程分支与本地分支在不同目录
+** .git/refs
+- heads，本地分支
+- remotes，远程分支
+- tags, 标记
+** 特殊指针
+- HEAD，当前分支
+- FETCH_HEAD
+- MERGE_HEAD
+** rev revision 修改
+- 标示一次提交
+- 可能是hash、分支名、指针（HEAD）、tag
+
+#+BEGIN_SRC shell
+git rev-parse [ref]
+git rev-parse --symbolic-full-name [ref] # 获取HEAD的ref文件位置
+#+END_SRC
+** rev more
+- HEAD = @
+- HEAD^, HEAD^^ = HEAD~2
+- HEAD^1, HEAD^2 多个父commit
+- HEAD^0 = committish
+- HEAD^{} = taggish
+- HEAD^{tree} = treeish
+- HEAD@{1} 最近一次变化的之前的HEAD(reflog)
+- HEAD@{u} 上游分支
+* merge 合并
+** 
+- 把两个分支合并
+- 合并成功会生成合并提交
+- 合并提交会有两个父commit
+
+指定分支合并到当前分支
+#+BEGIN_SRC bash
+git merge branch-name
+#+END_SRC
+* conflict 冲突
+** 
+- 两个分支都改过相同文件
+- 对于文本文件如果修改的不是同一行，git会自行解决冲突
+** solve conflict 解决冲突
+- 修改冲突文件，需包含两个分支的改动
+- 三向合并，base, mine, their
+** !!!
+- merge是把别的分支合到当前分支
+- 冲突时看到的改动都是别人的（其他分支的）
+- 要做的是协调冲突文件包含两个分支的改动
+
+- 不要恢复其他没有冲突的文件，不是你的改动
+- 不要恢复其他没有冲突的文件，不是你的改动
+- 不要恢复其他没有冲突的文件，不是你的改动
+* 
+#+ATTR_HTML: :class icon
+[[./data/question.png]]
+* checkout
+- 修改HEAD指向
+- 根据HEAD的位置重置workspace
+- 指向为分支名，切换分支
+- 指向为hash，头分离
+
+#+BEGIN_SRC bash
+git checkout 28bdef3
+git checkout opentest
+#+END_SRC
+* reset
+- reset修改当前分支的指向
+- --mixed重置Stage，保留WorkSpace
+- --soft两个都保留
+- --hard两个都重置
+
+#+BEGIN_SRC bash
+git reset opentest
+git reset --soft HEAD^
+#+END_SRC
+* 提交反悔
+** 
+#+BEGIN_SRC
+git commit --amend
+git reset --soft HEAD^
+#+END_SRC
+* commit+
+** 
+- workspace - stage - rev
+- 都可以理解为commit对象
+** 
+- 用stage生成 *新* 的commit
+- 修改分支头指向新的commit
+- 同时stage和workspace都保持不变
+* stash
+** 
+- 保存work space的改动
+- 切分支时有改动是不让切换，可以先stash在切，然后pop
+
+#+BEGIN_SRC shell
+git stash 
+git stash list
+git stash pop/apply [stash@{0}]
+git stash drop stash@{1}
+git stash clear
+#+END_SRC
+* reflog
+** 
+- git记录的所有分支头和HEAD的位置变化
+- 保存在.git/logs
+- HEAD@{1}，上次HEAD位置的rev
+
+#+BEGIN_SRC shell
+git reset --hard HEAD@{1}
+git reset master@{2}
+#+END_SRC
+* 头分离和提交丢失
+** 
+- 靠头节点追踪分支，头节点变化可能导致提交丢失
+- 只要提交改动短期不会丢失，只是追踪不到
+- reflog可以帮助找回头位置
+- 如果能记住commit的hash也能找到这次提交
+- 头分离状态下可以提交，但提交都是无法追踪的
+* 
+#+ATTR_HTML: :class icon
+[[./data/question.png]]
+* server - client
+** 
+- server为bare的git库
+- client为正常的git库
+* pull, push
+** 
+- 同步不同库的objects, refs, tags
+- 同步之间会自动调用gc
+- 远程库的分支在refs/remote下
+* remote (origin)
+** 
+- remote管理所有的远程仓库
+- 可以有多个remote仓库
+
+#+BEGIN_SRC
+git remote -v
+git remote add origin git@192.168.2.120:ink-sanguo-dev
+git remote set-url origin git@192.168.2.120:ink-sanguo-data
+#+END_SRC
+* clone做了什么？
+** 
+- 新建名字为origin的远程仓库，地址为clone的地址
+- 把origin仓库的objects, refs和tags全部拿到本地
+- 本地建立master分支并以origin/master为上游分支
+* 远程分支
+** 
+- 存在.git/refs/remote
+- 非本地的分支
+- 从不同的remote pull是获得
+#+BEGIN_SRC shell
+git branch -a
+#+END_SRC
+* 上游分支
+** 
+- 一般为远程分支
+- 比如：maseter -> origin/master
+- pull和push的默认分支
+
+#+BEGIN_SRC shell
+git rev-parse @{u}
+git branch -avv
+#+END_SRC
+* pull做了什么？
+** 
+更新上游分支位置，并与本地分支合并
+#+BEGIN_SRC shell
+git pull [-n]
+#+END_SRC
+** 
+#+BEGIN_SRC shell
+git fetch
+git merge
+#+END_SRC
+- fetch从远程仓库更新信息
+- merge把更新过的上游分支合并到当前分支
+** So
+- pull成功后有一次merge的提交
+- pull可能会产生冲突，有merge的操作
+* fetch
+** 
+- 只更新远程库的信息对象、分支、tag
+- 不修改本地的任何信息
+
+#+BEGIN_SRC shell
+git fetch [-a]
+#+END_SRC
+* pull的merge
+** 
+- pull的时候自动完成
+- 上游分支与本地分支的合并
+- 如果冲突，看到的改动应该都是上游分支的，不是你自己的
+- 解决冲突是把你的修改融合到上游分支的修改中
+* merge+
+** 
+恢复到merge前的状态
+#+BEGIN_SRC
+git merge --abort
+#+END_SRC
+
+解决好冲突后继续merge
+#+BEGIN_SRC 
+git merge --continue
+#+END_SRC
+* push做了什么？
+** 
+#+BEGIN_SRC shell
+git push [-n]
+#+END_SRC
+- 检查是否上游分支有更新
+- 检查本地分支相对上游分支是否为快进式提交
+- 把本地的objects和本地分支位置更新到远程对应分支
+* 快进式提交
+** 
+- 本地分支向上追溯能找到远程分支
+- 不是就意味着，在你上次更新后有人提交过数据
+** So
+- push提示非快进式提交后要用pull更新后才能再提交
+- pull后合并成功后本地分支就变为了快进式提交
+* 
+#+ATTR_HTML: :class icon
+[[./data/question.png]]
+* cherrypick
+** 
+- 提取一次或多次提交到当前分支
+- 修bug，在发布分支修好提交，再cherrypick到开发分支
+#+BEGIN_SRC
+git cherrypick dbc82r4 [-n] [--continue] [--abort]
+#+END_SRC
+* rebase
+** 
+- master分支的提交推荐使用，可以减少一次merge的提交
+- cherrypick所有的本地分支到base的改动到上游分支
+
+#+BEGIN_SRC
+git rebase origin/master [--continue] [--abort]
+#+END_SRC
+* merge vs rebase
+** 
+- rebase可以保证提交历史的简洁，减少很多不必要的合并提交
+- 短期的主分支的开发，合并是最好都用rebase的方式
+- 长期的开发的分支可以用merge，保留分支信息
+* 如何快速建立与远程分支对应的本地分支？
+** 
+- 直接用远程分支的名字来checkout
+- checkout会检查有没有这个远程分支
+- 以这个名字建立本地分支
+- 并把远程分支设置为上游分支
+#+BEGIN_SRC shell
+git checkout feature/war
+#+END_SRC
+* 
+#+ATTR_HTML: :class icon
+[[./data/question.png]]
+* books
+** 
+- Git权威指南, ISBN 9787111349679
+- Pro Git, official, https://git-scm.com/book/en/v2
